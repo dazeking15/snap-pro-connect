@@ -3,6 +3,8 @@ import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scrip
 import { useEffect, useState, type ReactNode } from "react";
 import { Aperture, Bell, CalendarCheck, Heart, Home, MessageCircle, Moon, Search, Sun, User } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -66,6 +68,12 @@ function ThemeToggle() {
   return <button aria-label="Toggle theme" onClick={flip} className="grid h-9 w-9 place-items-center rounded-full ring-1 ring-border transition hover:bg-muted">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</button>;
 }
 
+function AccountButton() {
+  const { user } = useAuth();
+  if (!user) return <Link to="/auth" className="rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground">Sign in</Link>;
+  return <button onClick={() => supabase.auth.signOut()} className="rounded-full px-3 py-1.5 text-sm ring-1 ring-border hover:bg-muted">Sign out</button>;
+}
+
 const desk = [
   { to: "/search", l: "Explore" }, { to: "/bookings", l: "Bookings" }, { to: "/messages", l: "Messages" },
   { to: "/dashboard", l: "For photographers" }, { to: "/admin", l: "Admin" },
@@ -89,6 +97,7 @@ function RootComponent() {
             <Link to="/notifications" aria-label="Notifications" className="relative grid h-9 w-9 place-items-center rounded-full ring-1 ring-border hover:bg-muted"><Bell className="h-4 w-4" /><span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent" /></Link>
             <ThemeToggle />
             <Link to="/favourites" className="hidden rounded-full px-3 py-1.5 text-sm ring-1 ring-border hover:bg-muted md:inline-flex"><Heart className="mr-1 h-4 w-4" />Saved</Link>
+            <AccountButton />
           </div>
         </div>
       </header>

@@ -5,6 +5,8 @@ import { Check, CreditCard, Lock } from "lucide-react";
 import { getPhotographer, zar, DAYS } from "@/lib/data";
 import { FeeBreakdown } from "@/components/snap";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/book/$id")({
   validateSearch: z.object({ pkg: z.string().optional() }),
@@ -33,7 +35,16 @@ function Book() {
   const [time, setTime] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
   const done = step === 4;
-  const pay = () => { setPaying(true); setTimeout(() => { setPaying(false); setStep(4); }, 1400); };
+  const pay = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast("Sign in to complete your booking"); window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`; return; }
+    setPaying(true);
+    const d = date!; const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const { error } = await supabase.from("bookings").insert({ user_id: user.id, photographer_id: p.id, package_name: sel.name, price: sel.price, session_date: iso, session_time: time! });
+    setPaying(false);
+    if (error) { toast.error("Booking failed, please try again"); return; }
+    setStep(4);
+  };
   const canNext = step === 0 || (step === 1 && date && time) || step === 2;
 
   if (done) return (
