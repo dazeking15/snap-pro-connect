@@ -32,7 +32,7 @@ function Bookings() {
   }, [user]);
   const cancel = async (id: string) => {
     const { error } = await supabase.from("bookings").update({ status: "Cancelled" }).eq("id", id);
-    if (error) return toast.error("Couldn't cancel");
+    if (error) { toast.error("Couldn't cancel"); return; }
     setItems(items.map((x) => x.id === id ? { ...x, status: "Cancelled" } : x)); toast("Booking cancelled", { description: "Refund issued per cancellation rules." });
   };
   if (!loading && !user) return <div className="py-20 text-center text-muted-foreground"><Link to="/auth" search={{ redirect: "/bookings" }} className="font-semibold text-foreground underline">Sign in</Link> to see your bookings.</div>;
