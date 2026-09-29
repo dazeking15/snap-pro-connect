@@ -15,9 +15,9 @@ export const Route = createFileRoute("/bookings")({
 });
 
 const initial = [
-  { id: "b1", p: PHOTOGRAPHERS[0], pkg: "Signature", date: "Sat, 10 Oct 2026", price: 3300, status: "Confirmed" },
-  { id: "b2", p: PHOTOGRAPHERS[2], pkg: "Essential", date: "Wed, 21 Oct 2026", price: 1200, status: "Pending" },
-  { id: "b3", p: PHOTOGRAPHERS[4], pkg: "Essential", date: "Sun, 16 Aug 2026", price: 800, status: "Completed" },
+  { id: "b1", p: PHOTOGRAPHERS[0]!, pkg: "Signature", date: "Sat, 10 Oct 2026", price: 3300, status: "Confirmed" },
+  { id: "b2", p: PHOTOGRAPHERS[2]!, pkg: "Essential", date: "Wed, 21 Oct 2026", price: 1200, status: "Pending" },
+  { id: "b3", p: PHOTOGRAPHERS[4]!, pkg: "Essential", date: "Sun, 16 Aug 2026", price: 800, status: "Completed" },
 ];
 const tone: Record<string, string> = { Confirmed: "bg-trust/12 text-trust", Pending: "bg-accent/20", Completed: "bg-muted", Cancelled: "bg-destructive/12 text-destructive" };
 

@@ -27,7 +27,7 @@ export type Photographer = {
   availableDays: number[]; profileQuality: number; joined: string; portfolio: string[];
   packages: { name: string; price: number; hours: number; desc: string }[];
   reviewList: { name: string; rating: number; text: string; date: string }[];
-};
+} as const;
 
 const G = {
   wed: ["photo-1519741497674-611481863552", "photo-1511285560929-80b456fea0bc", "photo-1516589178581-6cd7833ae3b2"],
@@ -35,8 +35,8 @@ const G = {
   evt: ["photo-1540575467063-178a50c2df87", "photo-1530103862676-de8c9debad1d", "photo-1523050854058-8df90110c9f1"],
   com: ["photo-1523275335684-37898b6baf30", "photo-1600596542815-ffad4c1539a9", "photo-1509631179647-0177331693ae"],
   fam: ["photo-1511895426328-dc8714191300", "photo-1461896836934-ffe607ba8211", "photo-1492691527719-9d1e07e534b4"],
-};
-const pf = (ids: string[]) => ids.map((i) => u(i, 1200));
+} as const;
+const pf = (ids: readonly string[]) => ids.map((i) => u(i, 1200));
 const pk = (b: number) => [
   { name: "Essential", price: b, hours: 1, desc: "1 hour session · 25 edited images" },
   { name: "Signature", price: Math.round(b * 2.2), hours: 3, desc: "3 hours · 80 edited images · online gallery" },
@@ -72,7 +72,7 @@ export function calcFees(price: number) {
 export const zar = (n: number) => "R" + n.toLocaleString("en-ZA", { maximumFractionDigits: 2 });
 
 /* ---------- Search ranking ---------- */
-export type Filters = { q?: string; city?: string; category?: string; maxPrice?: number; minRating?: number; day?: number; maxDistance?: number; verifiedOnly?: boolean; promotedOnly?: boolean };
+export type Filters = { q?: string | undefined; city?: string | undefined; category?: string | undefined; maxPrice?: number | undefined; minRating?: number | undefined; day?: number | undefined; maxDistance?: number | undefined; verifiedOnly?: boolean | undefined; promotedOnly?: boolean | undefined };
 export const isVerified = (p: Photographer) => p.badges.some((b) => b.includes("Verified"));
 
 export function searchPhotographers(f: Filters) {

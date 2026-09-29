@@ -13,7 +13,7 @@ export const Route = createFileRoute("/messages")({
 });
 
 function Messages() {
-  const [active, setActive] = useState(PHOTOGRAPHERS[0]);
+  const [active, setActive] = useState(PHOTOGRAPHERS[0]!);
   const [msgs, setMsgs] = useState([{ me: false, t: "Hi! Thanks for booking. Any shots you definitely want?" }, { me: true, t: "Yes — golden hour portraits by the lake please!" }]);
   const [text, setText] = useState("");
   return (

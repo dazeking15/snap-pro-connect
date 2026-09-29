@@ -21,7 +21,7 @@ const tx = [
 ];
 
 function Dashboard() {
-  const me = PHOTOGRAPHERS[0];
+  const me = PHOTOGRAPHERS[0]!;
   const gross = tx.reduce((s, t) => s + t.gross, 0);
   const fees = tx.reduce((s, t) => s + calcFees(t.gross).commission, 0);
   const pending = tx.filter((t) => t.status === "Pending").reduce((s, t) => s + calcFees(t.gross).photographerReceives, 0);

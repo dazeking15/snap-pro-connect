@@ -73,7 +73,7 @@ export function PhotographerCard({ p }: { p: Photographer }) {
           <Stars r={p.rating} n={p.reviews} />
         </div>
         <div className="flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">{catName(p.categories[0])}</span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">{catName(p.categories[0]!)}</span>
           {p.badges.slice(0, 2).map((b) => <TrustBadgeChip key={b} b={b} />)}
           {p.badges.length > 2 && <span className="text-[11px] text-muted-foreground">+{p.badges.length - 2}</span>}
         </div>

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/promoted")({
 function Promoted() {
   const [active, setActive] = useState(false);
   const next = new Date(); next.setMonth(next.getMonth() + 1);
-  const preview = { ...PHOTOGRAPHERS[0], promoted: true };
+  const preview = { ...PHOTOGRAPHERS[0]!, promoted: true };
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="grid items-center gap-8 md:grid-cols-2">

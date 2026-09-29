@@ -27,7 +27,7 @@ function Book() {
   const p = Route.useLoaderData();
   const { pkg } = Route.useSearch();
   const [step, setStep] = useState(0);
-  const [sel, setSel] = useState(p.packages.find((k) => k.name === pkg) ?? p.packages[0]);
+  const [sel, setSel] = useState(p.packages.find((k) => k.name === pkg) ?? p.packages[0]!);
   const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i + 1); return d; });
   const [date, setDate] = useState<Date | null>(null);
   const [time, setTime] = useState<string | null>(null);
