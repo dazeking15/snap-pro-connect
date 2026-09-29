@@ -3,6 +3,9 @@ import { BadgeCheck, Heart, Megaphone, MapPin, Star, Zap, Award, ShieldCheck, Cl
 import { useEffect, useState } from "react";
 import { type Photographer, type TrustBadge, catName, zar, DAYS } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 const badgeIcon: Record<TrustBadge, typeof BadgeCheck> = {
   "Verified Photographer": BadgeCheck, "ID Verified": ShieldCheck, "Portfolio Verified": BadgeCheck, "Business Verified": ShieldCheck,
@@ -29,14 +32,25 @@ export function PromotedPill({ className }: { className?: string }) {
 }
 
 export function useFavourites() {
+  const { user } = useAuth();
   const [favs, setFavs] = useState<string[]>([]);
   useEffect(() => {
-    const read = () => setFavs(JSON.parse(localStorage.getItem("snap-favs") || "[]"));
+    if (!user) { setFavs([]); return; }
+    const read = async () => {
+      const { data } = await supabase.from("favourites").select("photographer_id");
+      setFavs((data ?? []).map((r) => r.photographer_id));
+    };
     read(); window.addEventListener("favs", read); return () => window.removeEventListener("favs", read);
-  }, []);
-  const toggle = (id: string) => {
-    const next = favs.includes(id) ? favs.filter((f) => f !== id) : [...favs, id];
-    localStorage.setItem("snap-favs", JSON.stringify(next)); window.dispatchEvent(new Event("favs"));
+  }, [user]);
+  const toggle = async (id: string) => {
+    if (!user) { toast("Sign in to save photographers"); window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`; return; }
+    const has = favs.includes(id);
+    setFavs(has ? favs.filter((f) => f !== id) : [...favs, id]);
+    const { error } = has
+      ? await supabase.from("favourites").delete().eq("user_id", user.id).eq("photographer_id", id)
+      : await supabase.from("favourites").insert({ user_id: user.id, photographer_id: id });
+    if (error) toast.error("Couldn't update saved list");
+    window.dispatchEvent(new Event("favs"));
   };
   return { favs, toggle };
 }
