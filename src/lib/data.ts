@@ -27,7 +27,7 @@ export type Photographer = {
   availableDays: number[]; profileQuality: number; joined: string; portfolio: string[];
   packages: { name: string; price: number; hours: number; desc: string }[];
   reviewList: { name: string; rating: number; text: string; date: string }[];
-} as const;
+};
 
 const G = {
   wed: ["photo-1519741497674-611481863552", "photo-1511285560929-80b456fea0bc", "photo-1516589178581-6cd7833ae3b2"],
