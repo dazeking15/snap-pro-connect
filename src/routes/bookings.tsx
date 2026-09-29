@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
-import { PHOTOGRAPHERS, zar } from "@/lib/data";
+import { getPhotographer, zar, type Photographer } from "@/lib/data";
 import { PageHead } from "@/components/snap";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/bookings")({
   head: () => ({ meta: [
@@ -14,20 +16,30 @@ export const Route = createFileRoute("/bookings")({
   component: Bookings,
 });
 
-const initial = [
-  { id: "b1", p: PHOTOGRAPHERS[0]!, pkg: "Signature", date: "Sat, 10 Oct 2026", price: 3300, status: "Confirmed" },
-  { id: "b2", p: PHOTOGRAPHERS[2]!, pkg: "Essential", date: "Wed, 21 Oct 2026", price: 1200, status: "Pending" },
-  { id: "b3", p: PHOTOGRAPHERS[4]!, pkg: "Essential", date: "Sun, 16 Aug 2026", price: 800, status: "Completed" },
-];
+type Item = { id: string; p: Photographer; pkg: string; date: string; price: number; status: string };
 const tone: Record<string, string> = { Confirmed: "bg-trust/12 text-trust", Pending: "bg-accent/20", Completed: "bg-muted", Cancelled: "bg-destructive/12 text-destructive" };
 
 function Bookings() {
-  const [items, setItems] = useState(initial);
+  const { user, loading } = useAuth();
+  const [items, setItems] = useState<Item[]>([]);
   const [rating, setRating] = useState(0);
   const [reviewing, setReviewing] = useState<string | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("bookings").select("*").order("session_date", { ascending: false }).then(({ data }) => {
+      setItems((data ?? []).flatMap((r) => { const p = getPhotographer(r.photographer_id); return p ? [{ id: r.id, p, pkg: r.package_name, date: `${new Date(r.session_date).toDateString()} · ${r.session_time}`, price: r.price, status: r.status }] : []; }));
+    });
+  }, [user]);
+  const cancel = async (id: string) => {
+    const { error } = await supabase.from("bookings").update({ status: "Cancelled" }).eq("id", id);
+    if (error) return toast.error("Couldn't cancel");
+    setItems(items.map((x) => x.id === id ? { ...x, status: "Cancelled" } : x)); toast("Booking cancelled", { description: "Refund issued per cancellation rules." });
+  };
+  if (!loading && !user) return <div className="py-20 text-center text-muted-foreground"><Link to="/auth" search={{ redirect: "/bookings" }} className="font-semibold text-foreground underline">Sign in</Link> to see your bookings.</div>;
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <PageHead title="Bookings" sub="Upcoming sessions and history" />
+      {!items.length && <p className="py-10 text-center text-muted-foreground">No bookings yet. <Link to="/search" className="font-semibold text-foreground underline">Find a photographer</Link></p>}
       <div className="space-y-3">{items.map((b) => (
         <div key={b.id} className="rounded-3xl bg-card p-4 ring-1 ring-border">
           <div className="flex gap-4">
